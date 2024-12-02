@@ -1,13 +1,12 @@
-import { Type } from 'class-transformer';
-import { IsDate, IsString } from 'class-validator';
+import { IsString } from 'class-validator';
 
 export class findAllReciblesDto {
   @IsString()
-  startDate: Date;
+  startDate: string;
 
   @IsString()
-  endDate: Date;
+  endDate: string;
 
   @IsString()
-  merchantName: string;
+  merchantId: string;
 }

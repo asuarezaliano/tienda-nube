@@ -26,11 +26,12 @@ export class TransactionService {
         description: createTransactionDto.description,
         paymentMethod: createTransactionDto.paymentMethod,
         cardNumber: createTransactionDto.cardNumber.toString().slice(-4),
-        cardHolderName: createTransactionDto.name,
+        cardHolderName: createTransactionDto.cardHolderName,
         cardExpirationDate: createTransactionDto.cardExpirationDate
           .toLocaleDateString('en-US', { month: '2-digit', year: '2-digit' })
           .replace('/', '/'),
         cardCvv: createTransactionDto.cardCVV,
+        merchantId: createTransactionDto.merchantId,
       };
 
       const { data } = await firstValueFrom(
@@ -52,22 +53,30 @@ export class TransactionService {
         subtotal: Number(createTransactionDto.totalAmount),
         discount:
           createTransactionDto.paymentMethod === TransactionType.DEBIT_CARD
-            ? Number(createTransactionDto.totalAmount) * 0.02
-            : Number(createTransactionDto.totalAmount) * 0.04,
+            ? Number(
+                (Number(createTransactionDto.totalAmount) * 0.02).toFixed(2),
+              )
+            : Number(
+                (Number(createTransactionDto.totalAmount) * 0.04).toFixed(2),
+              ),
         total:
           createTransactionDto.paymentMethod === TransactionType.DEBIT_CARD
-            ? Number(createTransactionDto.totalAmount) * 0.98
-            : Number(createTransactionDto.totalAmount) * 0.96,
+            ? Number(
+                (Number(createTransactionDto.totalAmount) * 0.98).toFixed(2),
+              )
+            : Number(
+                (Number(createTransactionDto.totalAmount) * 0.96).toFixed(2),
+              ),
         transactionId: data.id,
-        merchantName: createTransactionDto.name,
+        merchantId: createTransactionDto.merchantId,
       };
 
-      const { data: receivableData } = await firstValueFrom(
+      await firstValueFrom(
         this.httpService.post(`${this.apiUrl}/receivables`, receivableToSave),
       );
 
       return data;
-    } catch (error) {
+    } catch {
       throw new Error('Error creating transaction');
     }
   }
@@ -76,11 +85,11 @@ export class TransactionService {
     try {
       const { data } = await firstValueFrom(
         this.httpService.get(
-          `${this.apiUrl}/transactions?cardHolderName=${findAllDto.name}`,
+          `${this.apiUrl}/transactions?merchantId=${findAllDto.merchantId}`,
         ),
       );
       return data;
-    } catch (error) {
+    } catch {
       throw new Error('Error finding all transactions');
     }
   }
@@ -94,7 +103,7 @@ export class TransactionService {
         throw new NotFoundException(`No transaction found for id ${id}`);
       }
       return data;
-    } catch (error) {
+    } catch {
       throw new InternalServerErrorException('Error finding transaction');
     }
   }
@@ -107,7 +116,7 @@ export class TransactionService {
         this.httpService.delete(`${this.apiUrl}/transactions/${id}`),
       );
       return data;
-    } catch (error) {
+    } catch {
       throw new InternalServerErrorException('Error removing transaction');
     }
   }

@@ -12,9 +12,10 @@ import {
 import { Type } from 'class-transformer';
 
 export class CreateTransactionDto {
-  @IsNumber()
   @IsPositive()
-  totalAmount: string;
+  @Type(() => Number)
+  @IsNumber({ maxDecimalPlaces: 2, allowNaN: false })
+  totalAmount: number;
 
   @IsString()
   description: string;
@@ -29,7 +30,10 @@ export class CreateTransactionDto {
   cardNumber: number;
 
   @IsString()
-  name: string;
+  cardHolderName: string;
+
+  @IsString()
+  merchantId: string;
 
   @IsDate()
   @Type(() => Date)

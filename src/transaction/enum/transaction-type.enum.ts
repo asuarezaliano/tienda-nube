@@ -12,3 +12,8 @@ export enum RecibleStatusType {
   PAID = 'PAID',
   WAITING_FUNDS = 'WAITING_FUNDS',
 }
+
+export const RecibleStatusTypeList = [
+  RecibleStatusType.PAID,
+  RecibleStatusType.WAITING_FUNDS,
+];
